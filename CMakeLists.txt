@@ -7,7 +7,13 @@ endif()
 
 project ("SpaceGame")
 
-add_executable (SpaceGame "main.cpp" )
+
+add_executable (
+	SpaceGame "Source/main.cpp"
+	"Source/System/SpriteSystem.cpp"
+)
+
+target_include_directories (SpaceGame PRIVATE "Source/")
 
 add_subdirectory ("External/entt")
 
@@ -45,9 +51,9 @@ target_link_libraries (
 	EnTT::EnTT
 )
 
-include_directories (${CMAKE_SOURCE_DIR}/External/SFML-2.5.1/include)
+target_include_directories (SpaceGame PRIVATE External/SFML-2.5.1/include)
 
-target_compile_definitions(SpaceGame PRIVATE SFML_STATIC)
+target_compile_definitions (SpaceGame PRIVATE SFML_STATIC)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property (TARGET SpaceGame PROPERTY CXX_STANDARD 20)
