@@ -9,8 +9,11 @@ project ("SpaceGame")
 
 
 add_executable (
-	SpaceGame "Source/main.cpp"
+	SpaceGame 
+	"Source/main.cpp"
 	"Source/System/SpriteSystem.cpp"
+	"Source/System/PhysicsSystem.cpp"
+	"Source/System/SpaceShipSystem.cpp"
 )
 
 target_include_directories (SpaceGame PRIVATE "Source/")
