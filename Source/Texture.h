@@ -11,4 +11,4 @@ struct TTextures {
 	sf::Texture SpaceShip;
 };
 
-std::optional<TTextures> GTextures;
+inline std::optional<TTextures> GTextures;

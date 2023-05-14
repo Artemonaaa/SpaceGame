@@ -43,7 +43,7 @@ int main() {
         float DeltaTime = DeltaClock.restart().asSeconds();
 
         PhysicsSystemUpdate(Registry, DeltaTime);
-        SpaceShipSystemUpdate(Registry, DeltaTime);
+        SpaceShipSystemUpdate(Registry, Window, DeltaTime);
 
         Window.clear();
         SpriteSystemUpdate(Registry, Window);

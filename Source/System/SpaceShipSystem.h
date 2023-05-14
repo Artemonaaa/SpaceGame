@@ -2,4 +2,4 @@
 
 #include <entt/entt.hpp>
 
-auto SpaceShipSystemUpdate(entt::registry& Registry, float DeltaTime) -> void;
+auto SpaceShipSystemUpdate(entt::registry& Registry, sf::RenderWindow& Window, float DeltaTime) -> void;

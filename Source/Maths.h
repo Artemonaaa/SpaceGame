@@ -16,3 +16,7 @@ inline auto GetNormalized(sf::Vector2f Vector) -> sf::Vector2f {
 	}
 	return Vector / Length;
 }	
+
+inline auto GetAngle(sf::Vector2f Vector) -> float {
+	return atan2f(Vector.y, Vector.x) / Pi * 180.0f;
+}
