@@ -2,14 +2,17 @@
 
 #include "Components/TransformComponent.h"
 #include "Components/SpriteComponent.h"
+
 #include "Texture.h"
+#include "Maths.h"
 
 auto SpriteSystemUpdate(entt::registry& Registry, sf::RenderWindow& Window) -> void {
-    auto View = Registry.view<TTransformComponent, TSpriteComponent>();
+    auto View = Registry.view<const TTransformComponent, TSpriteComponent>();
 
-    View.each([&Window](TTransformComponent& TransformComponent, TSpriteComponent& SpriteComponent) {
+    View.each([&Window](const TTransformComponent& TransformComponent, TSpriteComponent& SpriteComponent) {
         SpriteComponent.Sprite.setPosition(TransformComponent.Position);
-        SpriteComponent.Sprite.setOrigin(sf::Vector2f(GTextures->SpaceShip.getSize()) / 2.0f);
+        SpriteComponent.Sprite.setRotation(TransformComponent.Rotation / Pi * 180.0F);
+
         Window.draw(SpriteComponent.Sprite);
     });
 }

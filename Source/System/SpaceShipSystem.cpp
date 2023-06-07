@@ -5,12 +5,27 @@
 #include "Components/TransformComponent.h"
 #include "Components/SpaceShipComponent.h"
 #include "Components/SpriteComponent.h"
+#include "Components/PhysicsComponent.h"
+#include <Components/BulletComponent.h>
+
 #include "Maths.h"
+#include "Texture.h"
+
+auto CreateEntityBullet(entt::registry& Registry, sf::Vector2f Position, float Rotation, sf::Vector2f Velocity) -> entt::entity {
+	auto Entity = Registry.create();
+
+	Registry.emplace<TSpriteComponent>(Entity, GetCentered(sf::Sprite(GTextures->Bullet)));
+	Registry.emplace<TTransformComponent>(Entity, Position, Rotation);
+	Registry.emplace<TPhysicsComponent>(Entity, Velocity, 8.0f);
+	Registry.emplace<TBulletComponent>(Entity);
+
+	return Entity;
+}
 
 auto SpaceShipSystemUpdate(entt::registry& Registry, sf::RenderWindow& Window, float DeltaTime) -> void {
-	auto View = Registry.view<TSpaceShipComponent, TTransformComponent, TSpriteComponent>();
+	auto View = Registry.view<TSpaceShipComponent, TTransformComponent, TPhysicsComponent>();
 
-	View.each([DeltaTime, &Window](TTransformComponent& TransformComponent, TSpriteComponent& SpriteComponent) {
+	View.each([DeltaTime, &Window, &Registry](TSpaceShipComponent& SpaceShipComponent,TTransformComponent& TransformComponent, TPhysicsComponent& PhysicsComponent) {
 		sf::Vector2f Offset;
 		float Speed = 500.0F;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -26,11 +41,16 @@ auto SpaceShipSystemUpdate(entt::registry& Registry, sf::RenderWindow& Window, f
 			Offset.y += 1.0F;
 		}
 		Offset = GetNormalized(Offset);
-		TransformComponent.Position += Offset * Speed * DeltaTime;
+		PhysicsComponent.Velocity = Offset * Speed;
 
 		sf::Vector2f MousePosition = sf::Vector2f(sf::Mouse::getPosition(Window));
-		sf::Vector2f ToMouse = MousePosition - SpriteComponent.Sprite.getPosition();
+		sf::Vector2f ToMouse = MousePosition - TransformComponent.Position;
 
-		SpriteComponent.Sprite.setRotation(GetAngle(ToMouse) + 90.0f);
+		TransformComponent.Rotation = GetAngle(ToMouse) + Pi / 2;
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && SpaceShipComponent.BulletTimer.getElapsedTime().asSeconds() > 0.25F) {
+			CreateEntityBullet(Registry, TransformComponent.Position, TransformComponent.Rotation, GetNormalized(ToMouse) * Speed);
+			SpaceShipComponent.BulletTimer.restart();
+		}
 	});
 }

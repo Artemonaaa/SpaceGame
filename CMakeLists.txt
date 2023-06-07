@@ -14,6 +14,8 @@ add_executable (
 	"Source/System/SpriteSystem.cpp"
 	"Source/System/PhysicsSystem.cpp"
 	"Source/System/SpaceShipSystem.cpp"
+	"Source/System/BulletSystem.cpp"
+	"Source/System/AsteroidSystem.cpp"
 )
 
 target_include_directories (SpaceGame PRIVATE "Source/")

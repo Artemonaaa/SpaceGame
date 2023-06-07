@@ -1,25 +1,39 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <entt/entt.hpp>
+#include <iostream>
+#include <format>
 
 #include "System/SpriteSystem.h"
 #include "System/PhysicsSystem.h"
 #include "System/SpaceShipSystem.h"
+#include "System/BulletSystem.h"
+#include "System/AsteroidSystem.h"
 
 #include "Components/TransformComponent.h"
 #include "Components/SpriteComponent.h"
 #include "Components/PhysicsComponent.h"
 #include "Components/SpaceShipComponent.h"
+#include "Components/AsteroidComponent.h"
+
 #include "Texture.h"
+#include "Random.h"
+
 
 auto CreateEntitySpaceShip(entt::registry& Registry) -> entt::entity {
     auto Entity = Registry.create();
-   
-    Registry.emplace<TSpriteComponent>(Entity, sf::Sprite(GTextures->SpaceShip));
-    Registry.emplace<TTransformComponent>(Entity, sf::Vector2f(100.0F, 100.0F));
+
+    Registry.emplace<TSpriteComponent>(Entity, GetCentered(sf::Sprite(GTextures->SpaceShip)));
+    Registry.emplace<TTransformComponent>(Entity, sf::Vector2f(400.0F, 300.0F));
     Registry.emplace<TPhysicsComponent>(Entity, sf::Vector2f(0.0F, 0.0F));
-    Registry.emplace<TSpaceShipComponent>(Entity, 1.0f);
+    Registry.emplace<TSpaceShipComponent>(Entity);
 
     return Entity;
+}
+
+auto OnPhysicsComponentDestroy(entt::registry& Registry, entt::entity Entity) -> void {
+    for (auto& CollisionEvent : Registry.get<TPhysicsComponent>(Entity).CollisionEvents) {
+        *CollisionEvent.ShouldRespond = false;
+    }
 }
 
 int main() {
@@ -30,7 +44,11 @@ int main() {
 
     sf::Clock DeltaClock;
 
+    Registry.on_destroy<TPhysicsComponent>().connect<OnPhysicsComponentDestroy>();
+
     CreateEntitySpaceShip(Registry);
+    auto AsteroidSystem = TAsteroidSystem();
+    auto PhysicsSystem = TPhysicsSystem();
 
     while (Window.isOpen()) {
         sf::Event Event;
@@ -42,8 +60,10 @@ int main() {
 
         float DeltaTime = DeltaClock.restart().asSeconds();
 
-        PhysicsSystemUpdate(Registry, DeltaTime);
+        PhysicsSystem.Update(Registry, DeltaTime);
         SpaceShipSystemUpdate(Registry, Window, DeltaTime);
+        BulletSystemUpdate(Registry);
+        AsteroidSystem.Update(Registry, Window);
 
         Window.clear();
         SpriteSystemUpdate(Registry, Window);

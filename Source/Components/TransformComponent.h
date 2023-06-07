@@ -4,4 +4,5 @@
 
 struct TTransformComponent {
     sf::Vector2f Position = sf::Vector2f();;
+    float Rotation = {};
 };
